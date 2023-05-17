@@ -1,7 +1,6 @@
-import "./LoginFrontPage.css"
 import React from "react"
 
-function LoginFrontPage() {
+function Drinks() {
 
 
     return(
@@ -11,4 +10,4 @@ function LoginFrontPage() {
     )
 }
 
-export default LoginFrontPage
+export default Drinks
