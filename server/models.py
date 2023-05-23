@@ -2,20 +2,14 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db
 from sqlalchemy.orm import validates
-from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class User(SerializerMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password_hash = db.Column(db.String, nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    password = db.Column(db.String, nullable=False)
 
 
 
@@ -37,6 +31,7 @@ class Topping(SerializerMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
+    sides = db.relationship('SideWithTopping', back_populates='topping')
     products = db.relationship('ProductWithTopping', back_populates='topping')
 
 class ProductWithTopping(SerializerMixin, db.Model):
@@ -48,6 +43,28 @@ class ProductWithTopping(SerializerMixin, db.Model):
 
     product = db.relationship('Product', back_populates='toppings')
     topping = db.relationship('Topping', back_populates='products')
+
+class Side(SerializerMixin, db.Model):
+    __tablename__ = 'sides'
+    serialize_rules = ('-toppings',)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    price = db.Column(db.Numeric, nullable=False)
+    set_toppings = db.Column(db.String)
+    custom = db.Column(db.String)
+
+    side_with_toppings = db.relationship('SideWithTopping', back_populates='side')
+
+
+class SideWithTopping(SerializerMixin, db.Model):
+    __tablename__ = 'sidewithtoppings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    side_id = db.Column(db.Integer, db.ForeignKey('sides.id'), nullable=False)
+    topping_id = db.Column(db.Integer, db.ForeignKey('toppings.id'), nullable=False)
+
+    side = db.relationship('Side', back_populates='side_with_toppings')
+    topping = db.relationship('Topping', back_populates='sides')
 
 class Order(SerializerMixin, db.Model):
     __tablename__ = 'orders'
@@ -97,3 +114,11 @@ class Payment(SerializerMixin, db.Model):
         if len(cardnumber_str) != 3:
             raise ValueError('Number must be 3 digits')
         return cardnumber
+    
+class Drink(SerializerMixin, db.Model):
+    __tablename__ = 'drinks'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    price = db.Column(db.Numeric, nullable=False)
+    alcoholic = db.Column(db.Boolean, nullable=False)
+    

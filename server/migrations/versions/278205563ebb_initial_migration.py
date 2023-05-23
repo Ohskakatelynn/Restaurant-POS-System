@@ -1,8 +1,8 @@
 """Initial migration.
 
-Revision ID: 6018d594fa3b
+Revision ID: 278205563ebb
 Revises: 
-Create Date: 2023-05-16 16:07:49.839509
+Create Date: 2023-05-18 12:53:20.586561
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6018d594fa3b'
+revision = '278205563ebb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,7 @@ def upgrade():
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
-    sa.Column('password_hash', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
@@ -59,7 +59,6 @@ def upgrade():
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('productwithtopping_id', sa.Integer(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
-    sa.Column('unit_price', sa.Numeric(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], name=op.f('fk_order_items_order_id_orders')),
     sa.ForeignKeyConstraint(['productwithtopping_id'], ['productwithtoppings.id'], name=op.f('fk_order_items_productwithtopping_id_productwithtoppings')),
     sa.PrimaryKeyConstraint('id')

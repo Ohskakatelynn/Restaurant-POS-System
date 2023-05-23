@@ -2,7 +2,7 @@
 from flask import request, make_response
 from flask_restful import Resource
 from config import app, db, api
-from models import User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment
+from models import User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment, Drink, Side, SideWithTopping
 
 
 class Users(Resource):
@@ -16,7 +16,7 @@ class Users(Resource):
         data = request.get_json()
         newUser = User(
             username= data["username"],
-            password_hash = data["password_hash"],
+            password= data["password"],
             )
         try:
             db.session.add(newUser)
@@ -118,6 +118,46 @@ api.add_resource(Products, '/products')
 
 
 
+class ProductsById(Resource):
+    def get(self, id):
+        p = Product.query.filter_by(id = id).first()
+        if p == None:
+            return make_response({'error': 'no Products'}, 404)
+        return make_response(p.to_dict(), 200)
+    def delete(self, id):
+        p = Product.query.filter_by(id = id).first()
+        db.session.delete(p)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Product deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            p = Product.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(p, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no product'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(p)
+            db.session.commit()
+        
+        return make_response(o.to_dict(), 200)
+    
+api.add_resource(ProductsById, '/products/<int:id>')
+
+
+
 
 class Toppings(Resource):
     def get(self):
@@ -171,6 +211,47 @@ class Toppings(Resource):
         return response
         
 api.add_resource(Toppings, '/toppings')
+
+
+
+
+class ToppingsById(Resource):
+    def get(self, id):
+        t = Topping.query.filter_by(id = id).first()
+        if t == None:
+            return make_response({'error': 'no Toppings'}, 404)
+        return make_response(t.to_dict(), 200)
+    def delete(self, id):
+        t = Topping.query.filter_by(id = id).first()
+        db.session.delete(t)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Topping deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            t = Topping.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(t, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no topping'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(t)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+api.add_resource(ToppingsById, '/toppings/<int:id>')
 
 
 
@@ -231,6 +312,44 @@ api.add_resource(ProductWithToppings, '/productwithtoppings')
 
 
 
+
+class ProductsWithToppingsById(Resource):
+    def get(self, id):
+        pwt = ProductWithTopping.query.filter_by(id = id).first()
+        if pwt == None:
+            return make_response({'error': 'no Products With Toppings'}, 404)
+        return make_response(pwt.to_dict(), 200)
+    def delete(self, id):
+        pwt = ProductWithTopping.query.filter_by(id = id).first()
+        db.session.delete(pwt)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Product With Topping deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            pwt = ProductWithTopping.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(pwt, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no product with toppings'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(pwt)
+            db.session.commit()
+        
+        return make_response(pwt.to_dict(), 200)
+    
+api.add_resource(ProductsWithToppingsById, '/productwithtoppings/<int:id>')
 
 
 class OrderItems(Resource):
@@ -350,12 +469,342 @@ api.add_resource(Orders, '/orders')
 
 
 
+class OrdersById(Resource):
+    def get(self, id):
+        o = Order.query.filter_by(id = id).first()
+        if o == None:
+            return make_response({'error': 'no Orders'}, 404)
+        return make_response(t.to_dict(), 200)
+    def delete(self, id):
+        o = Order.query.filter_by(id = id).first()
+        db.session.delete(o)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Order deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            o = Order.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(o, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no order'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(o)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+api.add_resource(OrdersById, '/orders/<int:id>')
+
+
+
+
+class Sides(Resource):
+    def get(self):
+        s_list = [s.to_dict() for s in Side.query.all()]
+        if len(s_list) == 0:
+            return make_response({'error': 'no sides'}, 404)
+        return make_response(s_list, 200)
+    
+    def post (self):
+        data = request.get_json()
+        newSide = Side(
+            name= data["name"],
+            price= data["price"],
+            )
+        try:
+            db.session.add(newSide)
+            db.session.commit()
+            return make_response (newSide.to_dict(), 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 422)
+        
+    def patch(self, id):
+        try:
+            s = Side.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(s, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no side'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(s)
+            db.session.commit()
+        
+        return make_response(s.to_dict(), 200)
+    
+    def delete(self, id):
+        s = Side.query.filter_by(id = id).first()
+        db.session.delete(s)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Side deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+        
+api.add_resource(Sides, '/sides')
+
+
+
+
+
+class SidesById(Resource):
+    def get(self, id):
+        s = Side.query.filter_by(id = id).first()
+        if s == None:
+            return make_response({'error': 'no Sides'}, 404)
+        return make_response(t.to_dict(), 200)
+    def delete(self, id):
+        s = Side.query.filter_by(id = id).first()
+        db.session.delete(s)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Side deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            s = Side.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(s, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no side'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(s)
+            db.session.commit()
+        
+        return make_response(s.to_dict(), 200)
+    
+api.add_resource(SidesById, '/sides/<int:id>')
 
 
 
 
 
 
+class SideWithToppings(Resource):
+    def get(self):
+        swt_list = [swt.to_dict() for swt in SideWithTopping.query.all()]
+        if len(swt_list) == 0:
+            return make_response({'error': 'no sides with toppings'}, 404)
+        return make_response(swt_list, 200)
+    
+    def post (self):
+        data = request.get_json()
+        newSideWithToppings = SideWithTopping(
+            side_id= data["side.id"],
+            topping_id = data["topping.id"],
+            )
+        try:
+            db.session.add(newSideWithToppings)
+            db.session.commit()
+            return make_response (newSideWithToppings.to_dict(), 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 422)
+        
+    def patch(self, id):
+        try:
+            swt = SideWithTopping.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(swt, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no side with toppings'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(swt)
+            db.session.commit()
+        
+        return make_response(swt.to_dict(), 200)
+    
+    def delete(self, id):
+        swt = SideWithTopping.query.filter_by(id = id).first()
+        db.session.delete(swt)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Side with topping deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+        
+api.add_resource(SideWithToppings, '/sidewithtoppings')
+
+
+
+
+class SidesWithToppingsById(Resource):
+    def get(self, id):
+        swt = SideWithTopping.query.filter_by(id = id).first()
+        if swt == None:
+            return make_response({'error': 'no Sides With Toppings'}, 404)
+        return make_response(swt.to_dict(), 200)
+    def delete(self, id):
+        swt = SideWithTopping.query.filter_by(id = id).first()
+        db.session.delete(swt)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Side With Topping deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            swt = SideWithTopping.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(swt, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no side with toppings'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(swt)
+            db.session.commit()
+        
+        return make_response(swt.to_dict(), 200)
+    
+api.add_resource(SidesWithToppingsById, '/sidewithtoppings/<int:id>')
+
+
+
+
+
+class Drinks(Resource):
+    def get(self):
+        d_list = [d.to_dict() for d in Drink.query.all()]
+        if len(d_list) == 0:
+            return make_response({'error': 'no drinks'}, 404)
+        return make_response(d_list, 200)
+    
+    def post (self):
+        data = request.get_json()
+        newDrink = Drink(
+            name= data["name"],
+            price = data["price"],
+            alcoholic = data["alcoholic"]
+            )
+        try:
+            db.session.add(newDrink)
+            db.session.commit()
+            return make_response (newDrink.to_dict(), 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 422)
+        
+    def patch(self, id):
+        try:
+            d = Drink.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(d, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no drink'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(d)
+            db.session.commit()
+        
+        return make_response(d.to_dict(), 200)
+    
+    def delete(self, id):
+        d = Drink.query.filter_by(id = id).first()
+        db.session.delete(d)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Drink deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+        
+api.add_resource(Drinks, '/drinks')
+
+
+
+
+class DrinksById(Resource):
+    def get(self, id):
+        d = Drink.query.filter_by(id = id).first()
+        if d == None:
+            return make_response({'error': 'no Drinks'}, 404)
+        return make_response(d.to_dict(), 200)
+    def delete(self, id):
+        d = Drink.query.filter_by(id = id).first()
+        db.session.delete(d)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Drink deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            d = Drink.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(d, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no drink'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(d)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+api.add_resource(DrinksById, '/drinks/<int:id>')
 
 
 

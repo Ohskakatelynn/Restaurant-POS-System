@@ -4,7 +4,7 @@ from random import randint, choice as rc
 
 # Local imports
 from app import app
-from models import db, User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment
+from models import db, User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment, Side, Drink
 
 if __name__ == '__main__':
     with app.app_context():
@@ -19,9 +19,10 @@ def make_this():
     Order.query.delete()
     OrderItem.query.delete()
     Payment.query.delete()
+    Side.query.delete()
 
-    u1= User(username= 'katelynnmorris', password_hash= 'steve123')
-    u2= User(username= 'kaydenravia', password_hash= '123steve')
+    u1= User(username= 'katelynnmorris', password= 'steve123')
+    u2= User(username= 'kaydenravia', password= '123steve')
 
     u= [u1,u2]
 
@@ -117,6 +118,46 @@ def make_this():
     oi= [oi1, oi2, oi3, oi4, oi5, oi6, oi7, oi8, oi9, oi10, oi11, oi12, oi13, oi14, oi15, oi16, oi17]
 
     db.session.add_all(oi)
+    db.session.commit()
+
+    s1= Side(name= 'Baked Potato', price= '4.99')
+    s2= Side(name= 'French Fries', price= '2.99')
+    s3= Side(name= 'Onion Rings', price= '4.99')
+    s4= Side(name= 'Spanish Rice', price= '2.99')
+    s5= Side(name= 'Garlic Toast', price= '1.99')
+    s6= Side(name= 'Mashed Potatoes', price= '1.99')
+    s7= Side(name= 'Corn', price= '1.99')
+    s8= Side(name= 'Green Beans', price= '1.99')
+    s9= Side(name= 'Chili', price= '2.99')
+    s10= Side(name= 'Broccoli', price= '2.99')
+    s11= Side(name= 'Asparagus', price= '4.99')
+    s12= Side(name= 'Mac and Cheese', price= '2.99')
+    s13= Side(name= 'Yams', price= '1.99')
+    s14= Side(name= 'Cornbread', price= '1.99')
+
+    s=[s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14]
+
+    db.session.add_all(s)
+    db.session.commit()
+
+    d1= Drink(name= 'Fountain Soda', price= '3.99', alcoholic= False)
+    d2= Drink(name= 'Bottled Soda', price= '3.99', alcoholic= False)
+    d3= Drink(name= 'Sweet Tea', price= '3.99', alcoholic= False)
+    d4= Drink(name= 'Blackberry Tea', price= '3.99', alcoholic= False)
+    d5= Drink(name= 'Unsweet Tea', price= '3.99', alcoholic= False)
+    d6= Drink(name= 'Lemonade', price= '3.99', alcoholic= False)
+    d7= Drink(name= 'Strawberry Lemonade', price= '3.99', alcoholic= False)
+    d8= Drink(name= 'Water', price= '3.99', alcoholic= False)
+    d9= Drink(name= 'Arnold Palmer', price= '3.99', alcoholic= False)
+    d10= Drink(name= 'Bud Light', price= '4.99', alcoholic= True)
+    d11= Drink(name= 'Michelob', price= '4.99', alcoholic= True)
+    d12= Drink(name= 'Shot', price= '4.99', alcoholic= True)
+    d13= Drink(name= 'Single Mixed Drink', price= '6.99', alcoholic= True)
+    d14= Drink(name= 'Double Mixed Drink', price= '10.99', alcoholic= True)
+
+    d=[d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14]
+
+    db.session.add_all(d)
     db.session.commit()
     
     
