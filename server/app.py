@@ -60,8 +60,6 @@ class Users(Resource):
 api.add_resource(Users, '/users')
 
 
-
-
 class Products(Resource):
     def get(self):
         p_list = [p.to_dict() for p in Product.query.all()]
@@ -117,7 +115,6 @@ class Products(Resource):
 api.add_resource(Products, '/products')
 
 
-
 class ProductsById(Resource):
     def get(self, id):
         p = Product.query.filter_by(id = id).first()
@@ -155,8 +152,6 @@ class ProductsById(Resource):
         return make_response(o.to_dict(), 200)
     
 api.add_resource(ProductsById, '/products/<int:id>')
-
-
 
 
 class Toppings(Resource):
@@ -213,8 +208,6 @@ class Toppings(Resource):
 api.add_resource(Toppings, '/toppings')
 
 
-
-
 class ToppingsById(Resource):
     def get(self, id):
         t = Topping.query.filter_by(id = id).first()
@@ -252,8 +245,6 @@ class ToppingsById(Resource):
         return make_response(t.to_dict(), 200)
     
 api.add_resource(ToppingsById, '/toppings/<int:id>')
-
-
 
 
 class ProductWithToppings(Resource):
@@ -309,8 +300,6 @@ class ProductWithToppings(Resource):
         return response
         
 api.add_resource(ProductWithToppings, '/productwithtoppings')
-
-
 
 
 class ProductsWithToppingsById(Resource):
@@ -408,9 +397,6 @@ class OrderItems(Resource):
 api.add_resource(OrderItems, '/orderitems')
 
 
-
-
-
 class Orders(Resource):
     def get(self):
         o_list = [o.to_dict() for o in Order.query.all()]
@@ -467,8 +453,6 @@ class Orders(Resource):
 api.add_resource(Orders, '/orders')
 
 
-
-
 class OrdersById(Resource):
     def get(self, id):
         o = Order.query.filter_by(id = id).first()
@@ -506,8 +490,6 @@ class OrdersById(Resource):
         return make_response(t.to_dict(), 200)
     
 api.add_resource(OrdersById, '/orders/<int:id>')
-
-
 
 
 class Sides(Resource):
@@ -565,9 +547,6 @@ class Sides(Resource):
 api.add_resource(Sides, '/sides')
 
 
-
-
-
 class SidesById(Resource):
     def get(self, id):
         s = Side.query.filter_by(id = id).first()
@@ -605,10 +584,6 @@ class SidesById(Resource):
         return make_response(s.to_dict(), 200)
     
 api.add_resource(SidesById, '/sides/<int:id>')
-
-
-
-
 
 
 class SideWithToppings(Resource):
@@ -666,8 +641,6 @@ class SideWithToppings(Resource):
 api.add_resource(SideWithToppings, '/sidewithtoppings')
 
 
-
-
 class SidesWithToppingsById(Resource):
     def get(self, id):
         swt = SideWithTopping.query.filter_by(id = id).first()
@@ -705,9 +678,6 @@ class SidesWithToppingsById(Resource):
         return make_response(swt.to_dict(), 200)
     
 api.add_resource(SidesWithToppingsById, '/sidewithtoppings/<int:id>')
-
-
-
 
 
 class Drinks(Resource):
@@ -766,8 +736,6 @@ class Drinks(Resource):
 api.add_resource(Drinks, '/drinks')
 
 
-
-
 class DrinksById(Resource):
     def get(self, id):
         d = Drink.query.filter_by(id = id).first()
@@ -805,10 +773,6 @@ class DrinksById(Resource):
         return make_response(t.to_dict(), 200)
     
 api.add_resource(DrinksById, '/drinks/<int:id>')
-
-
-
-
 
 
 if __name__ == '__main__':
