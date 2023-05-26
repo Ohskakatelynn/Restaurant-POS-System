@@ -57,8 +57,9 @@ def make_this():
     t13= Topping(name= 'Garlic Toast')
     t14= Topping(name= 'Salsa')
     t15= Topping(name= 'Guacamole')
+    t16= Topping(name= 'NONE')
 
-    t=[t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15]
+    t=[t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16]
 
     db.session.add_all(t)
     db.session.commit()
