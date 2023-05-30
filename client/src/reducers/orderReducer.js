@@ -1,5 +1,4 @@
-const ADD_TO_ORDER = 'ADD_TO_ORDER';
-const RESET_ORDER = 'RESET_ORDER';
+import { ADD_TO_ORDER, RESET_ORDER, REMOVE_FROM_ORDER } from '../actions/orderActions';
 
 
 const initialState = [];
@@ -10,6 +9,9 @@ const orderReducer = (state = initialState, action) => {
       return [...state, action.payload];
     case RESET_ORDER:
       return initialState;
+    case REMOVE_FROM_ORDER:
+      const index = action.payload;
+      return state.filter((item, i) => i !== index);
     default:
       return state;
   }

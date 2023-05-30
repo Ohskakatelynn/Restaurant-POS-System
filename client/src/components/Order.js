@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToOrder } from '../actions/orderActions';
+import { removeFromOrder } from '../actions/orderActions';
 
 
 function Order() {
@@ -9,8 +10,9 @@ function Order() {
 
   console.log('Order:', order);
 
-  const handleAddToOrder = (item) => {
-    dispatch(addToOrder(item));
+
+  const handleRemoveFromOrder = (index) => {
+    dispatch(removeFromOrder(index));
   };
 
   useEffect(() => {
@@ -30,19 +32,29 @@ function Order() {
   return (
     <div>
       <h2>Order Summary</h2>
-      {order.map((item, index) => (
-        <div key={index}>
-          <h3>Item {index + 1}</h3>
-          <p>Product: {item.product.name}</p>
-          <p>Toppings: {item.toppings.map((topping) => topping.name).join(', ')}</p>
-          <p>Side: {item.side.name}</p>
-          <p>Side Toppings: {item.sideToppings.map((topping) => topping.name).join(', ')}</p>
-          <hr />
-        </div>
-      ))}
-      <button onClick={handleCompleteOrder}>Complete Order</button>
+      {order.length > 0 ? (
+        <ul>
+          {order.map((item, index) => (
+            <li key={index}>
+              <p>Product: {item.product.name}</p>
+              <p>Toppings: {item.toppings.map((topping) => topping.name).join(', ')}</p>
+              <p>Side: {item.side.name}</p>
+              <p>Side Toppings: {item.sideToppings.map((topping) => topping.name).join(', ')}</p>
+              <button onClick={() => handleRemoveFromOrder(index)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No items in the order.</p>
+      )}
     </div>
   );
 }
 
 export default Order;
+
+
+
+
+
+

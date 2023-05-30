@@ -19,7 +19,9 @@ function FrontPage() {
       <button onClick={() => handleButtonClick('/Kids')}>Kids</button>
       <button onClick={() => handleButtonClick('/AlcoholicDrinks')}>AlcoholicDrinks</button>
       <button onClick={() => handleButtonClick('/Drinks')}>Drinks</button>
+      <div><button onClick={() => history.push('/order')}>View Order Summary</button></div>
     </div>
+    
   );
 }
 

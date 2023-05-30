@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { ADD_TO_ORDER } from './types';
-import { addToOrder } from '../actions/orderActions';
+import { addToOrder, removeFromOrder } from '../actions/orderActions';
 
 function Main() {
   const history = useHistory();
@@ -10,9 +9,7 @@ function Main() {
   const [selectedToppings, setSelectedToppings] = useState([]);
   const [selectedSide, setSelectedSide] = useState(null);
   const [selectedSideToppings, setSelectedSideToppings] = useState([]);
-  const [order, setOrder] = useState([]);
-
-  const Sorder = useSelector((state) => state);
+  const order = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
   const [products, setProducts] = useState([]);
@@ -23,11 +20,6 @@ function Main() {
     fetchProducts();
     fetchSides();
     fetchToppings();
-
-    const storedOrder = localStorage.getItem('order');
-    if (storedOrder) {
-      setOrder(JSON.parse(storedOrder));
-    }
   }, []);
 
   const fetchProducts = async () => {
@@ -96,16 +88,21 @@ function Main() {
       sideToppings: selectedSideToppings,
     };
     dispatch(addToOrder(orderItem));
+    history.push('/FrontPage')
+  };
+
+  const handleRemoveFromOrder = (index) => {
+    dispatch(removeFromOrder(index));
   };
 
   const handleOrderClick = () => {
-    // Pass the order data to the order page
-    history.push('/order', { order: order });
+    history.push('/order');
   };
 
   const handleClearToppings = () => {
     setSelectedToppings([]);
   };
+
 
   return (
     <div>
