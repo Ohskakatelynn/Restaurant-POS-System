@@ -5,7 +5,7 @@ function Drinks() {
 
     return(
         <div>
-            hello
+            drinks 
         </div>
     )
 }

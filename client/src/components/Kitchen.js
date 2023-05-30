@@ -5,7 +5,7 @@ function Kitchen() {
 
     return(
         <div>
-            hello
+            kitchen 
         </div>
     )
 }

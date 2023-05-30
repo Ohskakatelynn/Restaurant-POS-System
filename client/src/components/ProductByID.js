@@ -5,7 +5,7 @@ function ProductByID() {
 
     return(
         <div>
-            hello
+            productbyid
         </div>
     )
 }

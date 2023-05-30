@@ -5,7 +5,7 @@ function Kids() {
 
     return(
         <div>
-            hello
+            kids 
         </div>
     )
 }
