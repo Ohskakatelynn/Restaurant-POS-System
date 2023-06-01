@@ -88,7 +88,7 @@ function Main() {
       sideToppings: selectedSideToppings,
     };
     dispatch(addToOrder(orderItem));
-    history.push('/FrontPage')
+    history.push('/FrontPage');
   };
 
   const handleRemoveFromOrder = (index) => {
@@ -102,7 +102,7 @@ function Main() {
   const handleClearToppings = () => {
     setSelectedToppings([]);
   };
-
+  
 
   return (
     <div>

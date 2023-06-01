@@ -403,7 +403,7 @@ class OrderItemsById(Resource):
         o = OrderItem.query.filter_by(id = id).first()
         if o == None:
             return make_response({'error': 'no Orderitems'}, 404)
-        return make_response(t.to_dict(), 200)
+        return make_response(o.to_dict(), 200)
     def delete(self, id):
         o = OrderItem.query.filter_by(id = id).first()
         db.session.delete(o)
@@ -432,9 +432,9 @@ class OrderItemsById(Resource):
             db.session.add(o)
             db.session.commit()
         
-        return make_response(t.to_dict(), 200)
+        return make_response(o.to_dict(), 200)
     
-api.add_resource(OrderItemsById, '/orders/<int:id>')
+api.add_resource(OrderItemsById, '/orderitems/<int:id>')
 
 
 class Orders(Resource):
@@ -444,36 +444,43 @@ class Orders(Resource):
             return make_response({'error': 'no orders'}, 404)
         return make_response(o_list, 200)
     
-    def post (self):
+    def post(self):
         data = request.get_json()
-        newOrders = Order(
-            total_amount= data["total_amount"],
-            users_id = data["users.id"],
-            status= data["status"]
-            )
+        new_order = Order(
+            user_id=data["user_id"],
+            ticket_number_id=data["ticket_number_id"],
+            total_price=data["total_price"],
+            order_item=data["order_item"]
+        )
         try:
-            db.session.add(newOrders)
+            db.session.add(new_order)
             db.session.commit()
-            return make_response (newOrders.to_dict(), 200)
+            return make_response(new_order.to_dict(), 200)
         except Exception as e:
             db.session.rollback()
-            return make_response({'error': f'{repr(e)}'}, 422)
+            return make_response({'error': repr(e)}, 422)
         
     def patch(self, id):
         try:
-            o = Order.query.filter_by(id = id).first()
+            o = Order.query.filter_by(id=id).first()
 
-            for attr in request.get_json():
-                setattr(o, attr, request.get_json()[attr])
-        except:
-            response_body = {
-                'error': 'no orders'
-            }
-            return make_response( response_body, 404 )
-        else:
-            db.session.add(o)
+            data = request.get_json()
+            if not data:
+                response_body = {'error': 'Invalid JSON payload'}
+                return make_response(response_body, 400)
+
+            for attr, value in data.items():
+                if hasattr(o, attr):
+                    setattr(o, attr, value)
+                else:
+                    response_body = {'error': f'Attribute "{attr}" does not exist'}
+                    return make_response(response_body, 400)
+
             db.session.commit()
-        
+        except:
+            response_body = {'error': 'Order not found'}
+            return make_response(response_body, 404)
+
         return make_response(o.to_dict(), 200)
     
     def delete(self, id):
@@ -592,7 +599,7 @@ class SidesById(Resource):
         s = Side.query.filter_by(id = id).first()
         if s == None:
             return make_response({'error': 'no Sides'}, 404)
-        return make_response(t.to_dict(), 200)
+        return make_response(s.to_dict(), 200)
     def delete(self, id):
         s = Side.query.filter_by(id = id).first()
         db.session.delete(s)
@@ -871,7 +878,7 @@ api.add_resource(TicketNumbers, '/ticketnumbers')
 
 class TicketNumbersById(Resource):
     def get(self, id):
-        t = TicketNumbers.query.filter_by(id = id).first()
+        t = TicketNumber.query.filter_by(id = id).first()
         if t == None:
             return make_response({'error': 'no ticket numbers'}, 404)
         return make_response(t.to_dict(), 200)

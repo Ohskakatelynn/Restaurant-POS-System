@@ -35,7 +35,7 @@ class Topping(SerializerMixin, db.Model):
 
 class ProductWithTopping(SerializerMixin, db.Model):
     __tablename__ = 'productwithtoppings'
-    serialize_rules = ('-product.toppings',)
+    serialize_rules = ('-products', '-toppings')
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     topping_id = db.Column(db.Integer, db.ForeignKey('toppings.id'), nullable=False)
@@ -58,7 +58,6 @@ class Side(SerializerMixin, db.Model):
 
 class SideWithTopping(SerializerMixin, db.Model):
     __tablename__ = 'sidewithtoppings'
-    serialize_rules = ('-side.side_with_toppings',)
     id = db.Column(db.Integer, primary_key=True)
     side_id = db.Column(db.Integer, db.ForeignKey('sides.id'), nullable=False)
     topping_id = db.Column(db.Integer, db.ForeignKey('toppings.id'), nullable=False)
@@ -67,9 +66,10 @@ class SideWithTopping(SerializerMixin, db.Model):
     topping = db.relationship('Topping', back_populates='sides')
 
 
+
 class OrderItem(SerializerMixin, db.Model):
     __tablename__ = 'order_items'
-    
+    serialize_rules = ('-side_with_toppings','-product_with_toppings', '-orders')
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
     product_with_topping_id = db.Column(db.Integer, db.ForeignKey('productwithtoppings.id'), nullable=False)
@@ -77,8 +77,9 @@ class OrderItem(SerializerMixin, db.Model):
     mealprice = db.Column(db.Integer)
     status = db.Column(db.Boolean)
 
-    product_with_topping = db.relationship('ProductWithTopping', backref='order_items')
-    side_with_topping = db.relationship('SideWithTopping', backref='order_items')
+    product_with_topping = db.relationship('ProductWithTopping')
+    side_with_topping = db.relationship('SideWithTopping')
+
 
 
 class TicketNumber(SerializerMixin, db.Model):
@@ -89,7 +90,7 @@ class TicketNumber(SerializerMixin, db.Model):
 
 class Order(SerializerMixin, db.Model):
     __tablename__ = 'orders'
-
+    serialize_rules = ('-order_item',)
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     ticket_number_id = db.Column(db.Integer, db.ForeignKey('ticketnumbers.id'), nullable=False)

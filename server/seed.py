@@ -4,6 +4,11 @@ from random import randint, choice as rc
 from app import app
 from models import db, User, Product, Topping, ProductWithTopping, SideWithTopping, TicketNumber, Order, OrderItem, Payment, Side, Drink
 
+if __name__ == '__main__':
+    with app.app_context():
+        print("Starting seed...")
+        # Seed code goes here!
+        
 def make_this():
     User.query.delete()
     Product.query.delete()
