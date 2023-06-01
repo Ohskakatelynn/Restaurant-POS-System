@@ -2,7 +2,7 @@
 from flask import request, make_response
 from flask_restful import Resource
 from config import app, db, api
-from models import User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment, Drink, Side, SideWithTopping
+from models import User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment, Drink, Side, SideWithTopping, TicketNumber
 
 
 class Users(Resource):
@@ -353,6 +353,7 @@ class OrderItems(Resource):
         newOrderItems = OrderItem(
             order_id= data["orders.id"],
             productwithtopping_id = data["productwithtoppings.id"],
+            sidewithtopping_id = data["sidewithtoppings.id"],
             quantity= data["quantity"]
             )
         try:
@@ -395,6 +396,45 @@ class OrderItems(Resource):
         return response
         
 api.add_resource(OrderItems, '/orderitems')
+
+
+class OrderItemsById(Resource):
+    def get(self, id):
+        o = OrderItem.query.filter_by(id = id).first()
+        if o == None:
+            return make_response({'error': 'no Orderitems'}, 404)
+        return make_response(t.to_dict(), 200)
+    def delete(self, id):
+        o = OrderItem.query.filter_by(id = id).first()
+        db.session.delete(o)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Orderitem deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            o = OrderItem.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(o, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no orderitem'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(o)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+api.add_resource(OrderItemsById, '/orders/<int:id>')
 
 
 class Orders(Resource):
@@ -458,7 +498,7 @@ class OrdersById(Resource):
         o = Order.query.filter_by(id = id).first()
         if o == None:
             return make_response({'error': 'no Orders'}, 404)
-        return make_response(t.to_dict(), 200)
+        return make_response(o.to_dict(), 200)
     def delete(self, id):
         o = Order.query.filter_by(id = id).first()
         db.session.delete(o)
@@ -487,7 +527,7 @@ class OrdersById(Resource):
             db.session.add(o)
             db.session.commit()
         
-        return make_response(t.to_dict(), 200)
+        return make_response(o.to_dict(), 200)
     
 api.add_resource(OrdersById, '/orders/<int:id>')
 
@@ -770,12 +810,102 @@ class DrinksById(Resource):
             db.session.add(d)
             db.session.commit()
         
-        return make_response(t.to_dict(), 200)
+        return make_response(d.to_dict(), 200)
     
 api.add_resource(DrinksById, '/drinks/<int:id>')
 
 
+class TicketNumbers(Resource):
+    def get(self):
+        t_list = [t.to_dict() for t in TicketNumber.query.all()]
+        if len(t_list) == 0:
+            return make_response({'error': 'no tickets'}, 404)
+        return make_response(t_list, 200)
+    
+    def post (self):
+        data = request.get_json()
+        newTicketNumber = TicketNumber(
+            name= data["name"],
+            )
+        try:
+            db.session.add(newTicketNumber)
+            db.session.commit()
+            return make_response (newTicketNumber.to_dict(), 200)
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 422)
+        
+    def patch(self, id):
+        try:
+            t = TicketNumber.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(t, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no ticketnumber'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(t)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+    def delete(self, id):
+        t = TicketNumber.query.filter_by(id = id).first()
+        db.session.delete(t)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "TicketNumber deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+        
+api.add_resource(TicketNumbers, '/ticketnumbers')
+
+
+class TicketNumbersById(Resource):
+    def get(self, id):
+        t = TicketNumbers.query.filter_by(id = id).first()
+        if t == None:
+            return make_response({'error': 'no ticket numbers'}, 404)
+        return make_response(t.to_dict(), 200)
+    def delete(self, id):
+        t = TicketNumber.query.filter_by(id = id).first()
+        db.session.delete(t)
+        db.session.commit()
+        response_body = {
+            "deleted successfully": True,
+            "message": "Ticket number deleted successfully"
+        }
+        response = make_response(
+            response_body,
+            202
+        )
+        return response
+    def patch(self, id):
+        try:
+            t = TicketNumber.query.filter_by(id = id).first()
+
+            for attr in request.get_json():
+                setattr(t, attr, request.get_json()[attr])
+        except:
+            response_body = {
+                'error': 'no ticket number'
+            }
+            return make_response( response_body, 404 )
+        else:
+            db.session.add(t)
+            db.session.commit()
+        
+        return make_response(t.to_dict(), 200)
+    
+api.add_resource(TicketNumbersById, '/ticketnumbers/<int:id>')
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-
