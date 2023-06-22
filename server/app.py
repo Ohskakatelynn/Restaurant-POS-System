@@ -1,8 +1,19 @@
-#!/usr/bin/env python3
-from flask import request, make_response
-from flask_restful import Resource
-from config import app, db, api
-from models import User, Product, Topping, ProductWithTopping, Order, OrderItem, Payment, Drink, Side, SideWithTopping, TicketNumber
+from flask import Flask, make_response, request
+from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from models import db, User, Product, Topping, ProductWithTopping, SideWithTopping, Side, OrderItem, Order, Drink, TicketNumber
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/ohska/development/code/phase-5/Restaurant-POS-System/server/instance/app.db'
+app.config.from_pyfile('config.py')
+
+db.init_app(app)
+migrate = Migrate(app, db)
+CORS(app)
+
+api = Api(app)
 
 
 class Users(Resource):
@@ -149,7 +160,7 @@ class ProductsById(Resource):
             db.session.add(p)
             db.session.commit()
         
-        return make_response(o.to_dict(), 200)
+        return make_response(p.to_dict(), 200)
     
 api.add_resource(ProductsById, '/products/<int:id>')
 
@@ -256,50 +267,50 @@ class ProductWithToppings(Resource):
     
     def post (self):
         data = request.get_json()
-        newProductWithToppings = ProductWithTopping(
-            product_id= data["product.id"],
-            topping_id = data["topping.id"],
+        newProductWithTopping = ProductWithTopping(
+            product_id= data["product_id"],
+            topping_id = data["topping_id"]
             )
         try:
-            db.session.add(newProductWithToppings)
+            db.session.add(newProductWithTopping)
             db.session.commit()
-            return make_response (newProductWithToppings.to_dict(), 200)
+            return make_response (newProductWithTopping.to_dict(), 200)
         except Exception as e:
             db.session.rollback()
             return make_response({'error': f'{repr(e)}'}, 422)
-        
+
     def patch(self, id):
         try:
-            pwt = ProductWithTopping.query.filter_by(id = id).first()
+            pwt = ProductWithTopping.query.filter_by(id=id).first()
+            if not pwt:
+                return make_response({'error': 'no product with toppings'}, 404)
 
-            for attr in request.get_json():
-                setattr(pwt, attr, request.get_json()[attr])
-        except:
-            response_body = {
-                'error': 'no product with toppings'
-            }
-            return make_response( response_body, 404 )
-        else:
-            db.session.add(pwt)
+            args = request.get_json()
+            for attr, value in args.items():
+                setattr(pwt, attr, value)
+
             db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 500)
         
         return make_response(pwt.to_dict(), 200)
     
     def delete(self, id):
-        pwt = ProductWithTopping.query.filter_by(id = id).first()
+        pwt = ProductWithTopping.query.get(id)
+        if not pwt:
+            return make_response({'error': 'no product with toppings'}, 404)
+
         db.session.delete(pwt)
         db.session.commit()
+
         response_body = {
-            "deleted successfully": True,
+            "deleted_successfully": True,
             "message": "Product with topping deleted successfully"
         }
-        response = make_response(
-            response_body,
-            202
-        )
-        return response
-        
-api.add_resource(ProductWithToppings, '/productwithtoppings')
+        return make_response(response_body, 202)
+
+api.add_resource(ProductWithToppings, '/productwithtoppings/')
 
 
 class ProductsWithToppingsById(Resource):
@@ -642,51 +653,51 @@ class SideWithToppings(Resource):
     
     def post (self):
         data = request.get_json()
-        newSideWithToppings = SideWithTopping(
-            side_id= data["side.id"],
-            topping_id = data["topping.id"],
+        newSideWithTopping = SideWithTopping(
+            side_id= data["side_id"],
+            topping_id = data["topping_id"]
             )
         try:
-            db.session.add(newSideWithToppings)
+            db.session.add(newSideWithTopping)
             db.session.commit()
-            return make_response (newSideWithToppings.to_dict(), 200)
+            return make_response (newSideWithTopping.to_dict(), 200)
         except Exception as e:
             db.session.rollback()
             return make_response({'error': f'{repr(e)}'}, 422)
         
     def patch(self, id):
         try:
-            swt = SideWithTopping.query.filter_by(id = id).first()
+            swt = SideWithTopping.query.filter_by(id=id).first()
+            if not swt:
+                return make_response({'error': 'no side with toppings'}, 404)
 
-            for attr in request.get_json():
-                setattr(swt, attr, request.get_json()[attr])
-        except:
-            response_body = {
-                'error': 'no side with toppings'
-            }
-            return make_response( response_body, 404 )
-        else:
-            db.session.add(swt)
+            args = request.get_json()
+            for attr, value in args.items():
+                setattr(swt, attr, value)
+
             db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return make_response({'error': f'{repr(e)}'}, 500)
         
         return make_response(swt.to_dict(), 200)
     
     def delete(self, id):
-        swt = SideWithTopping.query.filter_by(id = id).first()
+        swt = SideWithTopping.query.get(id)
+        if not swt:
+            return make_response({'error': 'no side with toppings'}, 404)
+
         db.session.delete(swt)
         db.session.commit()
+
         response_body = {
-            "deleted successfully": True,
+            "deleted_successfully": True,
             "message": "Side with topping deleted successfully"
         }
-        response = make_response(
-            response_body,
-            202
-        )
-        return response
-        
-api.add_resource(SideWithToppings, '/sidewithtoppings')
+        return make_response(response_body, 202)
 
+
+api.add_resource(SideWithToppings, '/sidewithtoppings/')
 
 class SidesWithToppingsById(Resource):
     def get(self, id):

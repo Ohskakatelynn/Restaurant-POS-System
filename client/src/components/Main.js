@@ -24,7 +24,7 @@ function Main() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5555/products');
+      const response = await fetch('/products');
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -34,7 +34,7 @@ function Main() {
 
   const fetchSides = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5555/sides');
+      const response = await fetch('/sides');
       const data = await response.json();
       setSides(data);
     } catch (error) {
@@ -44,7 +44,7 @@ function Main() {
 
   const fetchToppings = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5555/toppings');
+      const response = await fetch('/toppings');
       const data = await response.json();
       setToppings(data);
     } catch (error) {
@@ -80,15 +80,72 @@ function Main() {
     });
   };
 
-  const handleAddToOrder = () => {
-    const orderItem = {
-      product: selectedProduct,
-      toppings: selectedToppings,
-      side: selectedSide,
-      sideToppings: selectedSideToppings,
-    };
-    dispatch(addToOrder(orderItem));
-    history.push('/FrontPage');
+  const handleAddToOrder = async () => {
+    try {
+      const productWithToppings = [];
+
+      for (const selectedTopping of selectedToppings) {
+        const productWithToppingResponse = await fetch('/productwithtoppings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            product_id: selectedProduct.id,
+            topping_id: selectedTopping.id,
+          }),
+        });
+
+        console.log(selectedProduct.id);
+        console.log(selectedTopping.id);
+
+        const productWithToppingData = await productWithToppingResponse.json();
+        productWithToppings.push(productWithToppingData);
+      }
+
+      console.log('ProductWithToppings created:', productWithToppings);
+
+      try {
+        const sideWithToppings = [];
+
+        for (const selectedSideTopping of selectedSideToppings) {
+          const sideWithToppingResponse = await fetch('/sidewithtoppings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              side_id: selectedSide.id,
+              topping_id: selectedSideTopping.id,
+            }),
+          });
+
+          console.log(selectedSide.id);
+          console.log(selectedSideTopping.id);
+
+          const sideWithToppingData = await sideWithToppingResponse.json();
+          sideWithToppings.push(sideWithToppingData);
+        }
+
+        console.log('SideWithToppings created:', sideWithToppings);
+
+        const orderItems = productWithToppings.map((productWithTopping) => ({
+          productWithToppingId: productWithTopping.id,
+          sideId: selectedSide ? selectedSide.id : null,
+          sideToppingIds: selectedSideToppings.map((topping) => topping.id),
+        }));
+
+        for (const orderItem of orderItems) {
+          dispatch(addToOrder(orderItem));
+        }
+
+        history.push('/order');
+      } catch (error) {
+        console.error('Error occurred while creating side with toppings:', error);
+      }
+    } catch (error) {
+      console.error('Error occurred while adding to order:', error);
+    }
   };
 
   const handleRemoveFromOrder = (index) => {
@@ -102,7 +159,6 @@ function Main() {
   const handleClearToppings = () => {
     setSelectedToppings([]);
   };
-  
 
   return (
     <div>

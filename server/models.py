@@ -35,7 +35,7 @@ class Topping(SerializerMixin, db.Model):
 
 class ProductWithTopping(SerializerMixin, db.Model):
     __tablename__ = 'productwithtoppings'
-    serialize_rules = ('-products', '-toppings')
+    serialize_rules = ('-product', '-topping')
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     topping_id = db.Column(db.Integer, db.ForeignKey('toppings.id'), nullable=False)
